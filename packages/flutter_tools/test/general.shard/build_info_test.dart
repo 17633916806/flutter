@@ -107,6 +107,17 @@ void main() {
     expect(() => getIOSArchForName('bogus'), throwsException);
   });
 
+  testWithoutContext('named BuildInfo has correct defaults', () {
+    expect(BuildInfo.debug.mode, BuildMode.debug);
+    expect(BuildInfo.debug.trackWidgetCreation, true);
+
+    expect(BuildInfo.profile.mode, BuildMode.profile);
+    expect(BuildInfo.profile.trackWidgetCreation, false);
+
+    expect(BuildInfo.release.mode, BuildMode.release);
+    expect(BuildInfo.release.trackWidgetCreation, false);
+  });
+
   testWithoutContext('toBuildSystemEnvironment encoding of standard values', () {
     const BuildInfo buildInfo = BuildInfo(BuildMode.debug, '',
       treeShakeIcons: true,
@@ -117,10 +128,12 @@ void main() {
       extraFrontEndOptions: <String>['--enable-experiment=non-nullable', 'bar'],
       extraGenSnapshotOptions: <String>['--enable-experiment=non-nullable', 'fizz'],
       bundleSkSLPath: 'foo/bar/baz.sksl.json',
-      packagesPath: 'foo/.packages',
+      packagesPath: 'foo/.dart_tool/package_config.json',
       codeSizeDirectory: 'foo/code-size',
       fileSystemRoots: <String>['test5', 'test6'],
       fileSystemScheme: 'scheme',
+      buildName: '122',
+      buildNumber: '22'
     );
 
     expect(buildInfo.toBuildSystemEnvironment(), <String, String>{
@@ -136,6 +149,8 @@ void main() {
       'CodeSizeDirectory': 'foo/code-size',
       'FileSystemRoots': 'test5,test6',
       'FileSystemScheme': 'scheme',
+      'BuildName': '122',
+      'BuildNumber': '22',
     });
   });
 
@@ -149,7 +164,7 @@ void main() {
       extraFrontEndOptions: <String>['--enable-experiment=non-nullable', 'bar'],
       extraGenSnapshotOptions: <String>['--enable-experiment=non-nullable', 'fizz'],
       bundleSkSLPath: 'foo/bar/baz.sksl.json',
-      packagesPath: 'foo/.packages',
+      packagesPath: 'foo/.dart_tool/package_config.json',
       codeSizeDirectory: 'foo/code-size',
       // These values are ignored by toEnvironmentConfig
       androidProjectArgs: <String>['foo=bar', 'fizz=bazz']
@@ -164,7 +179,7 @@ void main() {
       'EXTRA_FRONT_END_OPTIONS': '--enable-experiment=non-nullable,bar',
       'EXTRA_GEN_SNAPSHOT_OPTIONS': '--enable-experiment=non-nullable,fizz',
       'BUNDLE_SKSL_PATH': 'foo/bar/baz.sksl.json',
-      'PACKAGE_CONFIG': 'foo/.packages',
+      'PACKAGE_CONFIG': 'foo/.dart_tool/package_config.json',
       'CODE_SIZE_DIRECTORY': 'foo/code-size',
     });
   });
@@ -179,7 +194,7 @@ void main() {
       extraFrontEndOptions: <String>['--enable-experiment=non-nullable', 'bar'],
       extraGenSnapshotOptions: <String>['--enable-experiment=non-nullable', 'fizz'],
       bundleSkSLPath: 'foo/bar/baz.sksl.json',
-      packagesPath: 'foo/.packages',
+      packagesPath: 'foo/.dart_tool/package_config.json',
       codeSizeDirectory: 'foo/code-size',
       androidProjectArgs: <String>['foo=bar', 'fizz=bazz']
     );

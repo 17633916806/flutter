@@ -2313,7 +2313,7 @@ void main() {
     });
 
     testWidgets(
-      'PlatformViewLink Widget init, should create a SizedBox widget before onPlatformViewCreated and a PlatformViewSurface after',
+      'PlatformViewLink Widget init, should create a placeholder widget before onPlatformViewCreated and a PlatformViewSurface after',
       (WidgetTester tester) async {
         final int currentViewId = platformViewsRegistry.getNextPlatformViewId();
         late int createdPlatformViewId;
@@ -2337,13 +2337,20 @@ void main() {
         );
 
         await tester.pumpWidget(platformViewLink);
-        expect(() => tester.allWidgets.whereType<SizedBox>().first, returnsNormally);
+
+        expect(
+          tester.allWidgets.map((Widget widget) => widget.runtimeType.toString()).toList(),
+          equals(<String>['PlatformViewLink', '_PlatformViewPlaceHolder']),
+        );
 
         onPlatformViewCreatedCallBack(createdPlatformViewId);
 
         await tester.pump();
 
-        expect(() => tester.allWidgets.whereType<PlatformViewSurface>().first, returnsNormally);
+        expect(
+          tester.allWidgets.map((Widget widget) => widget.runtimeType.toString()).toList(),
+          equals(<String>['PlatformViewLink', 'Focus', '_FocusMarker', 'Semantics', 'PlatformViewSurface']),
+        );
 
         expect(createdPlatformViewId, currentViewId + 1);
       },

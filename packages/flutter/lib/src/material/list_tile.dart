@@ -694,11 +694,10 @@ class ListTile extends StatelessWidget {
     assert(debugCheckHasMaterial(context));
     final ThemeData theme = Theme.of(context);
     final ListTileThemeData tileTheme = ListTileTheme.of(context);
+    final IconThemeData iconThemeData = IconThemeData(color: _iconColor(theme, tileTheme));
 
-    IconThemeData? iconThemeData;
     TextStyle? leadingAndTrailingTextStyle;
     if (leading != null || trailing != null) {
-      iconThemeData = IconThemeData(color: _iconColor(theme, tileTheme));
       leadingAndTrailingTextStyle = _trailingAndLeadingTextStyle(theme, tileTheme);
     }
 
@@ -707,10 +706,7 @@ class ListTile extends StatelessWidget {
       leadingIcon = AnimatedDefaultTextStyle(
         style: leadingAndTrailingTextStyle!,
         duration: kThemeChangeDuration,
-        child: IconTheme.merge(
-          data: iconThemeData!,
-          child: leading!,
-        ),
+        child: leading!,
       );
     }
 
@@ -737,10 +733,7 @@ class ListTile extends StatelessWidget {
       trailingIcon = AnimatedDefaultTextStyle(
         style: leadingAndTrailingTextStyle!,
         duration: kThemeChangeDuration,
-        child: IconTheme.merge(
-          data: iconThemeData!,
-          child: trailing!,
-        ),
+        child: trailing!,
       );
     }
 
@@ -782,25 +775,61 @@ class ListTile extends StatelessWidget {
             top: false,
             bottom: false,
             minimum: resolvedContentPadding,
-            child: _ListTile(
-              leading: leadingIcon,
-              title: titleText,
-              subtitle: subtitleText,
-              trailing: trailingIcon,
-              isDense: _isDenseLayout(theme, tileTheme),
-              visualDensity: visualDensity ?? tileTheme.visualDensity ?? theme.visualDensity,
-              isThreeLine: isThreeLine,
-              textDirection: textDirection,
-              titleBaselineType: titleStyle.textBaseline!,
-              subtitleBaselineType: subtitleStyle?.textBaseline,
-              horizontalTitleGap: horizontalTitleGap ?? tileTheme.horizontalTitleGap ?? 16,
-              minVerticalPadding: minVerticalPadding ?? tileTheme.minVerticalPadding ?? 4,
-              minLeadingWidth: minLeadingWidth ?? tileTheme.minLeadingWidth ?? 40,
+            child: IconTheme.merge(
+              data: iconThemeData,
+              child: _ListTile(
+                leading: leadingIcon,
+                title: titleText,
+                subtitle: subtitleText,
+                trailing: trailingIcon,
+                isDense: _isDenseLayout(theme, tileTheme),
+                visualDensity: visualDensity ?? tileTheme.visualDensity ?? theme.visualDensity,
+                isThreeLine: isThreeLine,
+                textDirection: textDirection,
+                titleBaselineType: titleStyle.textBaseline!,
+                subtitleBaselineType: subtitleStyle?.textBaseline,
+                horizontalTitleGap: horizontalTitleGap ?? tileTheme.horizontalTitleGap ?? 16,
+                minVerticalPadding: minVerticalPadding ?? tileTheme.minVerticalPadding ?? 4,
+                minLeadingWidth: minLeadingWidth ?? tileTheme.minLeadingWidth ?? 40,
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<Widget>('leading', leading, defaultValue: null));
+    properties.add(DiagnosticsProperty<Widget>('title', title, defaultValue: null));
+    properties.add(DiagnosticsProperty<Widget>('subtitle', subtitle, defaultValue: null));
+    properties.add(DiagnosticsProperty<Widget>('trailing', trailing, defaultValue: null));
+    properties.add(FlagProperty('isThreeLine', value: isThreeLine, ifTrue:'THREE_LINE', ifFalse: 'TWO_LINE', showName: true, defaultValue: false));
+    properties.add(FlagProperty('dense', value: dense, ifTrue: 'true', ifFalse: 'false', showName: true));
+    properties.add(DiagnosticsProperty<VisualDensity>('visualDensity', visualDensity, defaultValue: null));
+    properties.add(DiagnosticsProperty<ShapeBorder>('shape', shape, defaultValue: null));
+    properties.add(DiagnosticsProperty<ListTileStyle>('style', style, defaultValue: null));
+    properties.add(ColorProperty('selectedColor', selectedColor, defaultValue: null));
+    properties.add(ColorProperty('iconColor', iconColor, defaultValue: null));
+    properties.add(ColorProperty('textColor', textColor, defaultValue: null));
+    properties.add(DiagnosticsProperty<EdgeInsetsGeometry>('contentPadding', contentPadding, defaultValue: null));
+    properties.add(FlagProperty('enabled', value: enabled, ifTrue: 'true', ifFalse: 'false', showName: true, defaultValue: true));
+    properties.add(DiagnosticsProperty<Function>('onTap', onTap, defaultValue: null));
+    properties.add(DiagnosticsProperty<Function>('onLongPress', onLongPress, defaultValue: null));
+    properties.add(DiagnosticsProperty<MouseCursor>('mouseCursor', mouseCursor, defaultValue: null));
+    properties.add(FlagProperty('selected', value: selected, ifTrue: 'true', ifFalse: 'false', showName: true, defaultValue: false));
+    properties.add(ColorProperty('focusColor', focusColor, defaultValue: null));
+    properties.add(ColorProperty('hoverColor', hoverColor, defaultValue: null));
+    properties.add(DiagnosticsProperty<FocusNode>('focusNode', focusNode, defaultValue: null));
+    properties.add(FlagProperty('autofocus', value: autofocus, ifTrue: 'true', ifFalse: 'false', showName: true, defaultValue: false));
+    properties.add(ColorProperty('tileColor', tileColor, defaultValue: null));
+    properties.add(ColorProperty('selectedTileColor', selectedTileColor, defaultValue: null));
+    properties.add(FlagProperty('enableFeedback', value: enableFeedback, ifTrue: 'true', ifFalse: 'false', showName: true));
+    properties.add(DoubleProperty('horizontalTitleGap', horizontalTitleGap, defaultValue: null));
+    properties.add(DoubleProperty('minVerticalPadding', minVerticalPadding, defaultValue: null));
+    properties.add(DoubleProperty('minLeadingWidth', minLeadingWidth, defaultValue: null));
   }
 }
 

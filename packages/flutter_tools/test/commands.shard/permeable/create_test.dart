@@ -1177,6 +1177,7 @@ void main() {
     expect(xcodeConfig, contains('FLUTTER_APPLICATION_PATH='));
     expect(xcodeConfig, contains('FLUTTER_TARGET='));
     expect(xcodeConfig, contains('COCOAPODS_PARALLEL_CODE_SIGN=true'));
+    expect(xcodeConfig, contains('EXCLUDED_ARCHS[sdk=iphoneos*]=armv7'));
     // Avoid legacy build locations to support Swift Package Manager.
     expect(xcodeConfig, isNot(contains('SYMROOT')));
 
@@ -1279,6 +1280,7 @@ void main() {
     expect(xcodeConfig, contains('FLUTTER_ROOT='));
     expect(xcodeConfig, contains('FLUTTER_APPLICATION_PATH='));
     expect(xcodeConfig, contains('COCOAPODS_PARALLEL_CODE_SIGN=true'));
+    expect(xcodeConfig, contains('EXCLUDED_ARCHS[sdk=iphoneos*]=armv7'));
     // Xcode project
     final String xcodeProjectPath = globals.fs.path.join('ios', 'Runner.xcodeproj', 'project.pbxproj');
     expectExists(xcodeProjectPath);
@@ -1381,6 +1383,8 @@ void main() {
     expect(plistFile, exists);
     final bool disabled = _getBooleanValueFromPlist(plistFile: plistFile, key: 'CADisableMinimumFrameDurationOnPhone');
     expect(disabled, isTrue);
+    final bool indirectInput = _getBooleanValueFromPlist(plistFile: plistFile, key: 'UIApplicationSupportsIndirectInputEvents');
+    expect(indirectInput, isTrue);
     final String displayName = _getStringValueFromPlist(plistFile: plistFile, key: 'CFBundleDisplayName');
     expect(displayName, 'My Project');
   });
@@ -1398,6 +1402,8 @@ void main() {
     expect(plistFile, exists);
     final bool disabled = _getBooleanValueFromPlist(plistFile: plistFile, key: 'CADisableMinimumFrameDurationOnPhone');
     expect(disabled, isTrue);
+    final bool indirectInput = _getBooleanValueFromPlist(plistFile: plistFile, key: 'UIApplicationSupportsIndirectInputEvents');
+    expect(indirectInput, isTrue);
     final String displayName = _getStringValueFromPlist(plistFile: plistFile, key: 'CFBundleDisplayName');
     expect(displayName, 'My Project');
   });
@@ -1415,6 +1421,8 @@ void main() {
     expect(plistFile, exists);
     final bool disabled = _getBooleanValueFromPlist(plistFile: plistFile, key: 'CADisableMinimumFrameDurationOnPhone');
     expect(disabled, isTrue);
+    final bool indirectInput = _getBooleanValueFromPlist(plistFile: plistFile, key: 'UIApplicationSupportsIndirectInputEvents');
+    expect(indirectInput, isTrue);
     final String displayName = _getStringValueFromPlist(plistFile: plistFile, key: 'CFBundleDisplayName');
     expect(displayName, 'My Project');
   }, overrides: <Type, Generator>{
@@ -1441,6 +1449,8 @@ void main() {
     expect(plistFile, exists);
     final bool disabled = _getBooleanValueFromPlist(plistFile: plistFile, key: 'CADisableMinimumFrameDurationOnPhone');
     expect(disabled, isTrue);
+    final bool indirectInput = _getBooleanValueFromPlist(plistFile: plistFile, key: 'UIApplicationSupportsIndirectInputEvents');
+    expect(indirectInput, isTrue);
     final String displayName = _getStringValueFromPlist(plistFile: plistFile, key: 'CFBundleDisplayName');
     expect(displayName, 'My Project');
   }, overrides: <Type, Generator>{
@@ -1467,6 +1477,8 @@ void main() {
     expect(plistFile, exists);
     final bool disabled = _getBooleanValueFromPlist(plistFile: plistFile, key: 'CADisableMinimumFrameDurationOnPhone');
     expect(disabled, isTrue);
+    final bool indirectInput = _getBooleanValueFromPlist(plistFile: plistFile, key: 'UIApplicationSupportsIndirectInputEvents');
+    expect(indirectInput, isTrue);
     final String displayName = _getStringValueFromPlist(plistFile: plistFile, key: 'CFBundleDisplayName');
     expect(displayName, 'My Project');
   });
@@ -1484,6 +1496,8 @@ void main() {
     expect(plistFile, exists);
     final bool disabled = _getBooleanValueFromPlist(plistFile: plistFile, key: 'CADisableMinimumFrameDurationOnPhone');
     expect(disabled, isTrue);
+    final bool indirectInput = _getBooleanValueFromPlist(plistFile: plistFile, key: 'UIApplicationSupportsIndirectInputEvents');
+    expect(indirectInput, isTrue);
     final String displayName = _getStringValueFromPlist(plistFile: plistFile, key: 'CFBundleDisplayName');
     expect(displayName, 'My Project');
   });
@@ -3001,8 +3015,9 @@ Future<void> _ensureFlutterToolsSnapshot() async {
     'cache',
     'flutter_tools.snapshot',
   ));
-  final String dotPackages = globals.fs.path.absolute(globals.fs.path.join(
-    '.packages',
+  final String packageConfig = globals.fs.path.absolute(globals.fs.path.join(
+    '.dart_tool',
+    'package_config.json'
   ));
 
   final File snapshotFile = globals.fs.file(flutterToolsSnapshotPath);
@@ -3012,7 +3027,7 @@ Future<void> _ensureFlutterToolsSnapshot() async {
 
   final List<String> snapshotArgs = <String>[
     '--snapshot=$flutterToolsSnapshotPath',
-    '--packages=$dotPackages',
+    '--packages=$packageConfig',
     flutterToolsPath,
   ];
   final ProcessResult snapshotResult = await Process.run(
