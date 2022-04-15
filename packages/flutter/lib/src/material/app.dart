@@ -193,7 +193,7 @@ class MaterialApp extends StatefulWidget {
   ///
   /// The boolean arguments, [routes], and [navigatorObservers], must not be null.
   const MaterialApp({
-    Key? key,
+    super.key,
     this.navigatorKey,
     this.scaffoldMessengerKey,
     this.home,
@@ -240,12 +240,11 @@ class MaterialApp extends StatefulWidget {
        routeInformationProvider = null,
        routeInformationParser = null,
        routerDelegate = null,
-       backButtonDispatcher = null,
-       super(key: key);
+       backButtonDispatcher = null;
 
   /// Creates a [MaterialApp] that uses the [Router] instead of a [Navigator].
   const MaterialApp.router({
-    Key? key,
+    super.key,
     this.scaffoldMessengerKey,
     this.routeInformationProvider,
     required RouteInformationParser<Object> this.routeInformationParser,
@@ -292,8 +291,7 @@ class MaterialApp extends StatefulWidget {
        onGenerateInitialRoutes = null,
        onUnknownRoute = null,
        routes = null,
-       initialRoute = null,
-       super(key: key);
+       initialRoute = null;
 
   /// {@macro flutter.widgets.widgetsApp.navigatorKey}
   final GlobalKey<NavigatorState>? navigatorKey;
@@ -752,9 +750,8 @@ class MaterialScrollBehavior extends ScrollBehavior {
       'Use ThemeData.useMaterial3 or override ScrollBehavior.buildOverscrollIndicator. '
       'This feature was deprecated after v2.13.0-0.0.pre.'
     )
-    AndroidOverscrollIndicator? androidOverscrollIndicator,
-  }) : _androidOverscrollIndicator = androidOverscrollIndicator,
-       super(androidOverscrollIndicator: androidOverscrollIndicator);
+    super.androidOverscrollIndicator,
+  }) : _androidOverscrollIndicator = androidOverscrollIndicator;
 
   final AndroidOverscrollIndicator? _androidOverscrollIndicator;
 

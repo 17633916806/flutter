@@ -94,10 +94,9 @@ enum _ScaffoldSlot {
 class ScaffoldMessenger extends StatefulWidget {
   /// Creates a widget that manages [SnackBar]s for [Scaffold] descendants.
   const ScaffoldMessenger({
-    Key? key,
+    super.key,
     required this.child,
-  }) : assert(child != null),
-       super(key: key);
+  }) : assert(child != null);
 
   /// The widget below this widget in the tree.
   ///
@@ -529,11 +528,9 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger> with TickerProvide
 
 class _ScaffoldMessengerScope extends InheritedWidget {
   const _ScaffoldMessengerScope({
-    Key? key,
-    required Widget child,
+    required super.child,
     required ScaffoldMessengerState scaffoldMessengerState,
-  }) : _scaffoldMessengerState = scaffoldMessengerState,
-      super(key: key, child: child);
+  }) : _scaffoldMessengerState = scaffoldMessengerState;
 
   final ScaffoldMessengerState _scaffoldMessengerState;
 
@@ -797,10 +794,8 @@ class _ScaffoldGeometryNotifier extends ChangeNotifier implements ValueListenabl
 // then _BodyBuilder will assert.
 class _BodyBoxConstraints extends BoxConstraints {
   const _BodyBoxConstraints({
-    double minWidth = 0.0,
-    double maxWidth = double.infinity,
-    double minHeight = 0.0,
-    double maxHeight = double.infinity,
+    super.maxWidth,
+    super.maxHeight,
     required this.bottomWidgetsHeight,
     required this.appBarHeight,
     required this.materialBannerHeight,
@@ -809,8 +804,7 @@ class _BodyBoxConstraints extends BoxConstraints {
        assert(appBarHeight != null),
        assert(appBarHeight >= 0),
        assert(materialBannerHeight != null),
-       assert(materialBannerHeight >= 0),
-       super(minWidth: minWidth, maxWidth: maxWidth, minHeight: minHeight, maxHeight: maxHeight);
+       assert(materialBannerHeight >= 0);
 
   final double bottomWidgetsHeight;
   final double appBarHeight;
@@ -842,14 +836,12 @@ class _BodyBoxConstraints extends BoxConstraints {
 // The constraints parameter is constructed in_ScaffoldLayout.performLayout().
 class _BodyBuilder extends StatelessWidget {
   const _BodyBuilder({
-    Key? key,
     required this.extendBody,
     required this.extendBodyBehindAppBar,
     required this.body,
   }) : assert(extendBody != null),
        assert(extendBodyBehindAppBar != null),
-       assert(body != null),
-       super(key: key);
+       assert(body != null);
 
   final Widget body;
   final bool extendBody;
@@ -1144,7 +1136,6 @@ class _ScaffoldLayout extends MultiChildLayoutDelegate {
 ///   when its [FloatingActionButtonLocation] is updated.
 class _FloatingActionButtonTransition extends StatefulWidget {
   const _FloatingActionButtonTransition({
-    Key? key,
     required this.child,
     required this.fabMoveAnimation,
     required this.fabMotionAnimator,
@@ -1152,8 +1143,7 @@ class _FloatingActionButtonTransition extends StatefulWidget {
     required this.currentController,
   }) : assert(fabMoveAnimation != null),
        assert(fabMotionAnimator != null),
-       assert(currentController != null),
-       super(key: key);
+       assert(currentController != null);
 
   final Widget? child;
   final Animation<double> fabMoveAnimation;
@@ -1466,7 +1456,7 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
 class Scaffold extends StatefulWidget {
   /// Creates a visual scaffold for material design widgets.
   const Scaffold({
-    Key? key,
+    super.key,
     this.appBar,
     this.body,
     this.floatingActionButton,
@@ -1493,8 +1483,7 @@ class Scaffold extends StatefulWidget {
   }) : assert(primary != null),
        assert(extendBody != null),
        assert(extendBodyBehindAppBar != null),
-       assert(drawerDragStartBehavior != null),
-       super(key: key);
+       assert(drawerDragStartBehavior != null);
 
   /// If true, and [bottomNavigationBar] or [persistentFooterButtons]
   /// is specified, then the [body] extends to the bottom of the Scaffold,
@@ -1928,12 +1917,19 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin, Resto
 
   /// Whether this scaffold has a non-null [Scaffold.appBar].
   bool get hasAppBar => widget.appBar != null;
+
   /// Whether this scaffold has a non-null [Scaffold.drawer].
   bool get hasDrawer => widget.drawer != null;
+
   /// Whether this scaffold has a non-null [Scaffold.endDrawer].
   bool get hasEndDrawer => widget.endDrawer != null;
+
   /// Whether this scaffold has a non-null [Scaffold.floatingActionButton].
   bool get hasFloatingActionButton => widget.floatingActionButton != null;
+
+  /// Whether this scaffold requires [Scaffold.appBar] to automatically add
+  /// dismiss button.
+  bool get requiresAppBarDismiss => _persistentSheetHistoryEntry != null;
 
   double? _appBarMaxHeight;
   /// The max height the [Scaffold.appBar] uses.
@@ -2062,28 +2058,28 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin, Resto
   PersistentBottomSheetController<dynamic>? _currentBottomSheet;
   final GlobalKey _currentBottomSheetKey = GlobalKey();
 
+  LocalHistoryEntry? _persistentSheetHistoryEntry;
   void _maybeBuildPersistentBottomSheet() {
     if (widget.bottomSheet != null && _currentBottomSheet == null) {
       // The new _currentBottomSheet is not a local history entry so a "back" button
       // will not be added to the Scaffold's appbar and the bottom sheet will not
       // support drag or swipe to dismiss.
       final AnimationController animationController = BottomSheet.createAnimationController(this)..value = 1.0;
-      LocalHistoryEntry? persistentSheetHistoryEntry;
       bool _persistentBottomSheetExtentChanged(DraggableScrollableNotification notification) {
         if (notification.extent > notification.initialExtent) {
-          if (persistentSheetHistoryEntry == null) {
-            persistentSheetHistoryEntry = LocalHistoryEntry(onRemove: () {
+          if (_persistentSheetHistoryEntry == null) {
+            _persistentSheetHistoryEntry = LocalHistoryEntry(onRemove: () {
               if (notification.extent > notification.initialExtent) {
                 DraggableScrollableActuator.reset(notification.context);
               }
               showBodyScrim(false, 0.0);
               _floatingActionButtonVisibilityValue = 1.0;
-              persistentSheetHistoryEntry = null;
+              _persistentSheetHistoryEntry = null;
             });
-            ModalRoute.of(context)!.addLocalHistoryEntry(persistentSheetHistoryEntry!);
+            ModalRoute.of(context)!.addLocalHistoryEntry(_persistentSheetHistoryEntry!);
           }
-        } else if (persistentSheetHistoryEntry != null) {
-          ModalRoute.of(context)!.removeLocalHistoryEntry(persistentSheetHistoryEntry!);
+        } else if (_persistentSheetHistoryEntry != null) {
+          ModalRoute.of(context)!.removeLocalHistoryEntry(_persistentSheetHistoryEntry!);
         }
         return false;
       }
@@ -2835,7 +2831,7 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin, Resto
     return _ScaffoldScope(
       hasDrawer: hasDrawer,
       geometryNotifier: _geometryNotifier,
-      child: ScrollMetricsNotificationObserver(
+      child: ScrollNotificationObserver(
         child: Material(
           color: widget.backgroundColor ?? themeData.scaffoldBackgroundColor,
           child: AnimatedBuilder(animation: _floatingActionButtonMoveController, builder: (BuildContext context, Widget? child) {
@@ -2943,7 +2939,7 @@ class _BottomSheetSuspendedCurve extends ParametricCurve<double> {
 
 class _StandardBottomSheet extends StatefulWidget {
   const _StandardBottomSheet({
-    Key? key,
+    super.key,
     required this.animationController,
     this.enableDrag = true,
     required this.onClosing,
@@ -2956,7 +2952,7 @@ class _StandardBottomSheet extends StatefulWidget {
     this.clipBehavior,
     this.constraints,
     this.onDispose,
-  }) : super(key: key);
+  });
 
   final AnimationController animationController; // we control it, but it must be disposed by whoever created it.
   final bool enableDrag;
@@ -3097,24 +3093,22 @@ class _StandardBottomSheetState extends State<_StandardBottomSheet> {
 /// [Scaffold.bottomSheet].
 class PersistentBottomSheetController<T> extends ScaffoldFeatureController<_StandardBottomSheet, T> {
   const PersistentBottomSheetController._(
-    _StandardBottomSheet widget,
-    Completer<T> completer,
-    VoidCallback close,
-    StateSetter setState,
+    super.widget,
+    super.completer,
+    super.close,
+    StateSetter super.setState,
     this._isLocalHistoryEntry,
-  ) : super._(widget, completer, close, setState);
+  ) : super._();
 
   final bool _isLocalHistoryEntry;
 }
 
 class _ScaffoldScope extends InheritedWidget {
   const _ScaffoldScope({
-    Key? key,
     required this.hasDrawer,
     required this.geometryNotifier,
-    required Widget child,
-  }) : assert(hasDrawer != null),
-       super(key: key, child: child);
+    required super.child,
+  }) : assert(hasDrawer != null);
 
   final bool hasDrawer;
   final _ScaffoldGeometryNotifier geometryNotifier;
